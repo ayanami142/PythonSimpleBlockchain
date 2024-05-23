@@ -8,8 +8,8 @@ class Block:
             index: int,
             previous_hash: str,
             transactions: str,
-            timestamp=float | None,
-            nonce=int | None
+            timestamp: float | None = None,
+            nonce: int = 0
     ) -> None:
         """
         Initialize a new block.
@@ -28,16 +28,29 @@ class Block:
         self.hash = self.calculate_hash()
 
     def calculate_hash(self):
+        """
+        Calculate the SHA-256 hash of the block.
+        :return: str - The hash of the block.
+        """
         block_string = f"{self.index}{self.previous_hash}{self.transactions}{self.timestamp}{self.nonce}"
         return hashlib.sha256(block_string.encode()).hexdigest()
 
-    def mine_block(self, difficulty):
+    def mine_block(self, difficulty: int) -> None:
+        """
+        Perform the proof-of-work algorithm to mine the block.
+        :param difficulty: int - The difficulty level for the proof-of-work algorithm,
+            represented by the number of leading zeros required in the hash.
+        """
         target = '0' * difficulty
         while self.hash[:difficulty] != target:
             self.nonce += 1
             self.hash = self.calculate_hash()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the block.
+        :return: str - A string representation of the block.
+        """
         return (f"Block(Index: {self.index}, "
                 f"Previous Hash: {self.previous_hash}, "
                 f"Transactions: {self.transactions}, "
@@ -54,7 +67,7 @@ class BlockChain:
              Difficulty level for mining blocks. Defaults to 6.
                 The higher the difficulty, the more computational
                 effort required to mine a block.
-        :returns: None
+        :return: None
         """
         self.chain = [BlockChain.create_genesis_block()]
         self.difficulty = difficulty
@@ -63,14 +76,14 @@ class BlockChain:
     def create_genesis_block() -> Block:
         """
         Create a Block instance with 0 values as the first block in the chain
-        :return: Block instance
+        :return: Block - Block instance
         """
         return Block(0, "0", "Genesis Block")
 
     def get_latest_block(self) -> Block:
         """
         Get the latest block from the chain
-        :return: Latest Block instance
+        :return: Block - Latest Block instance
         """
         return self.chain[-1]
 
@@ -90,7 +103,7 @@ class BlockChain:
         or current block 's hash doesn't equal to calculated hash,
         or mined hash doesn't equal to current block's hash
         else return True
-        :return: bool
+        :return: bool - is chain valid or not
         """
         for i in range(1, len(self.chain)):
             current_block = self.chain[i]
@@ -107,13 +120,13 @@ class BlockChain:
     def calculate_index(self) -> int:
         """
         Get the latest block's index and increment it
-        :return: calculated index for the block
+        :return: int - calculated index for the block
         """
         return self.get_latest_block().index + 1
 
     def __repr__(self) -> str:
         """
         Generate list of blocks in the chain and join them as a string
-        :return: joined list of strings with the blocks
+        :return: str - joined list of strings with the blocks
         """
         return "\n".join([str(block) for block in self.chain])
